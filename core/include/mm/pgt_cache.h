@@ -44,14 +44,16 @@ struct pgt {
  * possibly others. The value is based on the number of threads as an indicator
  * on how large the system might be.
  */
+/*
 #if CFG_NUM_THREADS < 2
 #define PGT_CACHE_SIZE	4
 #elif (CFG_NUM_THREADS == 2 && !defined(CFG_WITH_LPAE))
-#define PGT_CACHE_SIZE	8
+#define PGT_CACHE_SIZE	24
 #else
 #define PGT_CACHE_SIZE	ROUNDUP(CFG_NUM_THREADS * 2, PGT_NUM_PGT_PER_PAGE)
 #endif
-
+*/
+#define PGT_CACHE_SIZE	64
 SLIST_HEAD(pgt_cache, pgt);
 struct user_mode_ctx;
 

@@ -150,6 +150,11 @@
 #define OPTEE_RPC_CMD_SUPP_PLUGIN	U(12)
 
 /*
+ * tee-supplicant plugin command, see definition of protocol below
+ */
+#define OPTEE_RPC_CMD_SYSCALL		U(13)
+
+/*
  * Register timestamp buffer in the linux kernel optee driver
  *
  * [in]     value[0].a	    Subcommand (register buffer, unregister buffer)

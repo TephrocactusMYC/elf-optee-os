@@ -122,3 +122,11 @@
                      TEE_SCN_CRYP_OBJ_GENERATE_KEY, 4
 
         UTEE_SYSCALL _utee_cache_operation, TEE_SCN_CACHE_OPERATION, 3
+
+        UTEE_SYSCALL _utee_ldelf_map_zi, TEE_SCN_LDELF_MAP_ZI, 5
+
+        UTEE_SYSCALL _utee_ldelf_unmap, TEE_SCN_LDELF_UNMAP, 2
+
+        UTEE_SYSCALL _utee_ldelf_set_prot, TEE_SCN_LDELF_SET_PROT, 3
+
+        UTEE_SYSCALL _utee_ldelf_remap, TEE_SCN_LDELF_REMAP, 5

@@ -106,13 +106,16 @@ CFG_HALT_CORES_ON_PANIC ?= y
 CFG_TEE_CORE_NB_CORE ?= 4
 # [0e00.0000 0e0f.ffff] is reserved to early boot
 CFG_TZDRAM_START ?= 0x0e100000
-CFG_TZDRAM_SIZE  ?= 0x00f00000
+# CFG_TZDRAM_SIZE  ?= 0x00f00000
+# CFG_TZDRAM_START ?= 0x40000000
+CFG_TZDRAM_SIZE  ?= 0x08000000
 CFG_SHMEM_START  ?= 0x7fe00000
 CFG_SHMEM_SIZE   ?= 0x00200000
 # When Secure Data Path is enable, last MByte of TZDRAM is SDP test memory.
 CFG_TEE_SDP_MEM_SIZE ?= 0x00400000
 # Set VA space to 2MB for Kasan offset to match LPAE and 32bit MMU configs
-CFG_TEE_RAM_VA_SIZE ?= 0x00200000
+# CFG_TEE_RAM_VA_SIZE ?= 0x00200000
+CFG_TEE_RAM_VA_SIZE ?= 0x00800000
 ifeq ($(CFG_CORE_SANITIZE_KADDRESS),y)
 # CFG_ASAN_SHADOW_OFFSET is calculated as:
 # (&__asan_shadow_start - (TEE_RAM_VA_START / 8)
@@ -130,17 +133,21 @@ CFG_CORE_ASYNC_NOTIF_GIC_INTID ?= 219
 endif
 
 ifeq ($(PLATFORM_FLAVOR),qemu_armv8a)
-CFG_CORE_HEAP_SIZE ?= 131072
+# CFG_CORE_HEAP_SIZE ?= 131072
+CFG_CORE_HEAP_SIZE ?= 524288
 CFG_HALT_CORES_ON_PANIC ?= y
 CFG_TEE_CORE_NB_CORE ?= 4
 CFG_AUTO_MAX_PA_BITS ?= y
 ifneq ($(CFG_CORE_SEL2_SPMC),y)
 # [0e00.0000 0e0f.ffff] is reserved to early boot
-CFG_TZDRAM_START ?= 0x0e100000
-CFG_TZDRAM_SIZE  ?= 0x00f00000
+# CFG_TZDRAM_START ?= 0x0e100000
+CFG_TZDRAM_START ?= 0x40100000
+CFG_TZDRAM_SIZE  ?= 0x07f00000
 # SHM chosen arbitrary, in a way that it does not interfere
 # with initial location of linux kernel, dtb and initrd.
-CFG_SHMEM_START ?= 0x42000000
+# CFG_SHMEM_START ?= 0x42000000
+# CFG_SHMEM_SIZE  ?= 0x00200000
+CFG_SHMEM_START ?= 0x4A000000
 CFG_SHMEM_SIZE  ?= 0x00200000
 # When Secure Data Path is enable, last MByte of TZDRAM is SDP test memory.
 CFG_TEE_SDP_MEM_SIZE ?= 0x00400000

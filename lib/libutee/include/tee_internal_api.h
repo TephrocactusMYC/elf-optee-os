@@ -637,6 +637,9 @@ void TEE_BigIntComputeFMM(TEE_BigIntFMM *dest, const TEE_BigIntFMM *op1,
 			  const TEE_BigIntFMM *op2, const TEE_BigInt *n,
 			  const TEE_BigIntFMMContext *context);
 
+TEE_Result TEE_forward_syscall(long syscall_id, void *args, size_t size,
+			       long *p_ret);
+
 #define TA_EXPORT
 
 /*

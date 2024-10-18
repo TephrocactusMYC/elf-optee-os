@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <types_ext.h>
 #include <utee_types.h>
 #include <tee_api_types.h>
 #include <trace.h>
@@ -224,5 +225,18 @@ TEE_Result _utee_storage_obj_seek(unsigned long obj, int32_t offset,
 TEE_Result _utee_cache_operation(void *va, size_t l, unsigned long op);
 
 TEE_Result _utee_gprof_send(void *buf, size_t size, uint32_t *id);
+
+/* LDELF extension */
+TEE_Result _utee_ldelf_map_zi(vaddr_t *va, size_t num_bytes, size_t pad_begin,
+			      size_t pad_end, unsigned long flags);
+
+TEE_Result _utee_ldelf_unmap(vaddr_t va, size_t num_bytes);
+
+TEE_Result _utee_ldelf_set_prot(unsigned long va, size_t num_bytes,
+	                        unsigned long flags);
+
+TEE_Result _utee_ldelf_remap(unsigned long old_va, vaddr_t *new_va,
+			     size_t num_bytes, size_t pad_begin,
+			     size_t pad_end);
 
 #endif /* UTEE_SYSCALLS_H */

@@ -591,7 +591,6 @@ void init_external_dt(unsigned long phys_dt, size_t dt_sz)
 		     ret);
 		panic();
 	}
-
 	ret = fdt_open_into(dt->blob, dt->blob, dt_sz);
 	if (ret < 0) {
 		EMSG("Invalid Device Tree at %#lx: error %d", phys_dt, ret);

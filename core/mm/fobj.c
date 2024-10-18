@@ -19,16 +19,16 @@
 #include <tee_api_types.h>
 #include <types_ext.h>
 #include <util.h>
-
+#include <trace.h>
 #ifdef CFG_WITH_PAGER
 
-#define RWP_AE_KEY_BITS		256
+#define RWP_AE_KEY_BITS 256
 
 struct rwp_aes_gcm_iv {
 	uint32_t iv[3];
 };
 
-#define RWP_AES_GCM_TAG_LEN	16
+#define RWP_AES_GCM_TAG_LEN 16
 
 struct rwp_state {
 	uint64_t iv;
@@ -83,9 +83,8 @@ static void fobj_uninit(struct fobj *fobj)
 static TEE_Result rwp_load_page(void *va, struct rwp_state *state,
 				const uint8_t *src)
 {
-	struct rwp_aes_gcm_iv iv = {
-		.iv = { (vaddr_t)state, state->iv >> 32, state->iv }
-	};
+	struct rwp_aes_gcm_iv iv = { .iv = { (vaddr_t)state, state->iv >> 32,
+					     state->iv } };
 
 	if (!state->iv) {
 		/*
@@ -96,16 +95,16 @@ static TEE_Result rwp_load_page(void *va, struct rwp_state *state,
 		return TEE_SUCCESS;
 	}
 
-	return internal_aes_gcm_dec(&rwp_ae_key, &iv, sizeof(iv),
-				    NULL, 0, src, SMALL_PAGE_SIZE, va,
-				    state->tag, sizeof(state->tag));
+	return internal_aes_gcm_dec(&rwp_ae_key, &iv, sizeof(iv), NULL, 0, src,
+				    SMALL_PAGE_SIZE, va, state->tag,
+				    sizeof(state->tag));
 }
 
 static TEE_Result rwp_save_page(const void *va, struct rwp_state *state,
 				uint8_t *dst)
 {
 	size_t tag_len = sizeof(state->tag);
-	struct rwp_aes_gcm_iv iv = { };
+	struct rwp_aes_gcm_iv iv = {};
 
 	assert(state->iv + 1 > state->iv);
 
@@ -121,9 +120,8 @@ static TEE_Result rwp_save_page(const void *va, struct rwp_state *state,
 	iv.iv[1] = state->iv >> 32;
 	iv.iv[2] = state->iv;
 
-	return internal_aes_gcm_enc(&rwp_ae_key, &iv, sizeof(iv),
-				    NULL, 0, va, SMALL_PAGE_SIZE, dst,
-				    state->tag, &tag_len);
+	return internal_aes_gcm_enc(&rwp_ae_key, &iv, sizeof(iv), NULL, 0, va,
+				    SMALL_PAGE_SIZE, dst, state->tag, &tag_len);
 }
 
 static struct rwp_state_padded *idx_to_state_padded(size_t idx)
@@ -241,13 +239,13 @@ DECLARE_KEEP_PAGER(rwp_paged_iv_get_iv_vaddr);
  * Note: this variable is weak just to ease breaking its dependency chain
  * when added to the unpaged area.
  */
-const struct fobj_ops ops_rwp_paged_iv
-__weak __relrodata_unpaged("ops_rwp_paged_iv") = {
-	.free = rwp_paged_iv_free,
-	.load_page = rwp_paged_iv_load_page,
-	.save_page = rwp_paged_iv_save_page,
-	.get_iv_vaddr = rwp_paged_iv_get_iv_vaddr,
-};
+const struct fobj_ops
+	ops_rwp_paged_iv __weak __relrodata_unpaged("ops_rwp_paged_iv") = {
+		.free = rwp_paged_iv_free,
+		.load_page = rwp_paged_iv_load_page,
+		.save_page = rwp_paged_iv_save_page,
+		.get_iv_vaddr = rwp_paged_iv_get_iv_vaddr,
+	};
 
 static struct fobj *rwp_unpaged_iv_alloc(unsigned int num_pages)
 {
@@ -347,12 +345,12 @@ static void rwp_unpaged_iv_free(struct fobj *fobj)
  * Note: this variable is weak just to ease breaking its dependency chain
  * when added to the unpaged area.
  */
-const struct fobj_ops ops_rwp_unpaged_iv
-__weak __relrodata_unpaged("ops_rwp_unpaged_iv") = {
-	.free = rwp_unpaged_iv_free,
-	.load_page = rwp_unpaged_iv_load_page,
-	.save_page = rwp_unpaged_iv_save_page,
-};
+const struct fobj_ops
+	ops_rwp_unpaged_iv __weak __relrodata_unpaged("ops_rwp_unpaged_iv") = {
+		.free = rwp_unpaged_iv_free,
+		.load_page = rwp_unpaged_iv_load_page,
+		.save_page = rwp_unpaged_iv_save_page,
+	};
 
 static TEE_Result rwp_init(void)
 {
@@ -375,7 +373,8 @@ static TEE_Result rwp_init(void)
 
 	num_pool_pages = tee_mm_sec_ddr.size / SMALL_PAGE_SIZE;
 	num_fobj_pages = ROUNDUP(num_pool_pages * sizeof(*rwp_state_base),
-				 SMALL_PAGE_SIZE) / SMALL_PAGE_SIZE;
+				 SMALL_PAGE_SIZE) /
+			 SMALL_PAGE_SIZE;
 
 	/*
 	 * Each page in the pool needs a struct rwp_state.
@@ -402,7 +401,6 @@ driver_init_late(rwp_init);
 struct fobj *fobj_rw_paged_alloc(unsigned int num_pages)
 {
 	assert(num_pages);
-
 	if (IS_ENABLED(CFG_CORE_PAGE_TAG_AND_IV))
 		return rwp_paged_iv_alloc(num_pages);
 	else
@@ -495,12 +493,12 @@ DECLARE_KEEP_PAGER(rop_save_page);
  * Note: this variable is weak just to ease breaking its dependency chain
  * when added to the unpaged area.
  */
-const struct fobj_ops ops_ro_paged
-__weak __relrodata_unpaged("ops_ro_paged") = {
-	.free = rop_free,
-	.load_page = rop_load_page,
-	.save_page = rop_save_page,
-};
+const struct fobj_ops
+	ops_ro_paged __weak __relrodata_unpaged("ops_ro_paged") = {
+		.free = rop_free,
+		.load_page = rop_load_page,
+		.save_page = rop_save_page,
+	};
 
 #ifdef CFG_CORE_ASLR
 /*
@@ -531,8 +529,8 @@ struct fobj_ro_reloc_paged {
 const struct fobj_ops ops_ro_reloc_paged;
 
 static unsigned int get_num_rels(unsigned int num_pages,
-				 unsigned int reloc_offs,
-				 const uint32_t *reloc, unsigned int num_relocs)
+				 unsigned int reloc_offs, const uint32_t *reloc,
+				 unsigned int num_relocs)
 {
 	const unsigned int align_mask __maybe_unused = sizeof(long) - 1;
 	unsigned int nrels = 0;
@@ -546,7 +544,7 @@ static unsigned int get_num_rels(unsigned int num_pages,
 	 */
 	for (; n < num_relocs; n++) {
 		assert(IS_ALIGNED_WITH_TYPE(reloc[n], unsigned long));
-		assert(offs < reloc[n]);	/* check that it's sorted */
+		assert(offs < reloc[n]); /* check that it's sorted */
 		offs = reloc[n];
 		if (offs >= reloc_offs &&
 		    offs <= reloc_offs + num_pages * SMALL_PAGE_SIZE)
@@ -568,7 +566,7 @@ static void init_rels(struct fobj_ro_reloc_paged *rrp, unsigned int reloc_offs,
 	for (n = 0; n < npg; n++)
 		rrp->page_reloc_idx[n] = UINT16_MAX;
 
-	for (n = 0; n < num_relocs ; n++) {
+	for (n = 0; n < num_relocs; n++) {
 		if (reloc[n] < reloc_offs)
 			continue;
 
@@ -611,7 +609,7 @@ struct fobj *fobj_ro_reloc_paged_alloc(unsigned int num_pages, void *hashes,
 		return fobj_ro_paged_alloc(num_pages, hashes, store);
 
 	rrp = calloc(1, sizeof(*rrp) + num_pages * sizeof(uint16_t) +
-			nrels * sizeof(uint16_t));
+				nrels * sizeof(uint16_t));
 	if (!rrp)
 		return NULL;
 	rop_init(&rrp->rop, &ops_ro_reloc_paged, num_pages, hashes, store);
@@ -672,12 +670,12 @@ DECLARE_KEEP_PAGER(rrp_load_page);
  * Note: this variable is weak just to ease breaking its dependency chain
  * when added to the unpaged area.
  */
-const struct fobj_ops ops_ro_reloc_paged
-__weak __relrodata_unpaged("ops_ro_reloc_paged") = {
-	.free = rrp_free,
-	.load_page = rrp_load_page,
-	.save_page = rop_save_page, /* Direct reuse */
-};
+const struct fobj_ops
+	ops_ro_reloc_paged __weak __relrodata_unpaged("ops_ro_reloc_paged") = {
+		.free = rrp_free,
+		.load_page = rrp_load_page,
+		.save_page = rop_save_page, /* Direct reuse */
+	};
 #endif /*CFG_CORE_ASLR*/
 
 const struct fobj_ops ops_locked_paged;
@@ -705,8 +703,7 @@ static void lop_free(struct fobj *fobj)
 }
 
 static TEE_Result lop_load_page(struct fobj *fobj __maybe_unused,
-				unsigned int page_idx __maybe_unused,
-				void *va)
+				unsigned int page_idx __maybe_unused, void *va)
 {
 	assert(fobj->ops == &ops_locked_paged);
 	assert(refcount_val(&fobj->refc));
@@ -730,12 +727,12 @@ DECLARE_KEEP_PAGER(lop_save_page);
  * Note: this variable is weak just to ease breaking its dependency chain
  * when added to the unpaged area.
  */
-const struct fobj_ops ops_locked_paged
-__weak __relrodata_unpaged("ops_locked_paged") = {
-	.free = lop_free,
-	.load_page = lop_load_page,
-	.save_page = lop_save_page,
-};
+const struct fobj_ops
+	ops_locked_paged __weak __relrodata_unpaged("ops_locked_paged") = {
+		.free = lop_free,
+		.load_page = lop_load_page,
+		.save_page = lop_save_page,
+	};
 #endif /*CFG_WITH_PAGER*/
 
 #ifndef CFG_PAGED_USER_TA
@@ -776,7 +773,6 @@ struct fobj *fobj_sec_mem_alloc(unsigned int num_pages)
 err:
 	tee_mm_free(f->mm);
 	free(f);
-
 	return NULL;
 }
 
